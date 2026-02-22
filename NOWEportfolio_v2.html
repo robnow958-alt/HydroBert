@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opisy, które sprzedają</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #151515;
+            --primary-red: #cc0000;
+            --primary-red-glow: #ff1a1a;
+            --text-light: #e0e0e0;
+            --text-gray: #999;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Klasa pozwalająca na edycję (podświetla się delikatnie przy najechaniu) */
+        [contenteditable="true"]:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            outline: 1px dashed var(--text-gray);
+            border-radius: 3px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .highlight-bg {
+            background: linear-gradient(90deg, #990000 0%, #ff0000 50%, #990000 100%);
+            padding: 5px 20px;
+            display: inline-block;
+            transform: skewX(-10deg);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .highlight-bg span {
+            display: inline-block;
+            transform: skewX(10deg);
+            color: white;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        /* BELKA INFORMACYJNA */
+        .info-banner {
+            background-color: #111;
+            border: 1px solid #222;
+            color: #777;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 12px 20px;
+            margin-bottom: 40px;
+            border-radius: 3px;
+            line-height: 1.5;
+        }
+        
+        .info-banner strong {
+            display: block;
+            color: #999;
+            margin-bottom: 3px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* SEKCJA PROJEKTY */
+        .section-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+        }
+        
+        .section-title span {
+            color: var(--primary-red-glow);
+            text-decoration: underline;
+        }
+
+        .badge-title {
+            background: var(--primary-red);
+            padding: 2px 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        /* KARTY PRODUKTÓW */
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            position: relative;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-red);
+            box-shadow: 0 0 15px var(--primary-red);
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            background: #1a1a1a;
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 0.8rem;
+            text-align: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Placeholder gdy brak zdjęcia */
+        .product-image.no-photo {
+            background: #111;
+            border: 1px dashed #333;
+        }
+
+        .product-content {
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            color: white;
+        }
+
+        .product-title .red {
+            color: var(--primary-red-glow);
+        }
+
+        .product-bullets {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .product-bullets li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .check-icon {
+            color: var(--primary-red-glow);
+            font-weight: bold;
+        }
+
+        .effect-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .effect-badge {
+            background: var(--primary-red);
+            color: white;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            border-radius: 2px;
+        }
+
+        /* ROZWIŃ OPIS */
+        .expand-btn {
+            background: none;
+            border: 1px solid var(--primary-red);
+            color: var(--primary-red-glow);
+            padding: 5px 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .expand-btn:hover {
+            background: rgba(204, 0, 0, 0.1);
+        }
+
+        .expanded-content {
+            margin-top: 15px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-left: 2px solid var(--primary-red);
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .expanded-content.show {
+            display: block;
+        }
+
+        /* SEKCJA PROCES */
+        .process-section {
+            margin-top: 60px;
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 40px;
+        }
+
+        .process-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 20px;
+        }
+
+        .step {
+            flex: 1;
+            background: #111;
+            padding: 20px;
+            border: 1px solid #222;
+        }
+
+        .step h4 {
+            color: var(--primary-red-glow);
+            margin: 0 0 10px 0;
+        }
+
+        .step p {
+            font-size: 0.8rem;
+            color: #888;
+            margin: 0;
+        }
+
+        /* BOTTOM BLOCK (Dlaczego ja + Footer) */
+        .bottom-block {
+            margin-top: 60px;
+            background: #111;
+            border-top: 1px solid #333;
+        }
+
+        /* DLACZEGO JA? */
+        .why-me-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding: 40px;
+            border-bottom: 3px solid var(--primary-red);
+            text-align: left;
+        }
+
+        .why-me-title {
+            color: var(--primary-red-glow);
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            width: 250px;
+        }
+
+        .why-me-text {
+            color: #fff;
+            font-size: 1rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        /* CTA FOOTER */
+        .cta-footer {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .btn-main {
+            background: linear-gradient(180deg, #ff1a1a 0%, #cc0000 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 3px;
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-main:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+        }
+
+        /* RESPONSYWNOŚĆ DLA NOWEJ SEKCJI */
+        @media (max-width: 768px) {
+            .why-me-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 30px 20px;
+            }
+            .why-me-title {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- HEADER -->
+    <header>
+        <h1 contenteditable="true">OPISY, KTÓRE</h1>
+        <div class="highlight-bg">
+            <span contenteditable="true">SPRZEDAJĄ</span>
+        </div>
+        <p contenteditable="true">Copy techniczne dla branży narzędziowej i lifestyle</p>
+    </header>
+
+    <!-- BELKA INFORMACYJNA -->
+    <div class="info-banner" contenteditable="true">
+        <strong>PRZYKŁADOWE REALIZACJE COPY</strong>
+        Poniższe produkty są fikcyjne. Pokazują styl i strukturę opisu.
+    </div>
+
+    <!-- PROJEKTY -->
+    <div style="text-align: center;">
+        <div class="badge-title" contenteditable="true">PROJEKTY</div>
+    </div>
+    <h2 class="section-title" contenteditable="true">Teksty, które <span>zmieniają</span> odwiedzających w <span>klientów</span></h2>
+
+    <div class="product-list">
+        
+        <!-- PRODUKT 1 -->
+        <!-- 
+        ════════════════════════════════════════════
+        JAK WSTAWIĆ ZDJĘCIE:
+        Zamień src="TUTAJ_LINK_DO_ZDJECIA" 
+        na adres URL swojego zdjęcia, np:
+        src="https://twojadomena.pl/zdjecia/produkt1.jpg"
+        lub ścieżkę lokalną: src="img/produkt1.jpg"
+        ════════════════════════════════════════════
+        -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="TUTAJ_LINK_DO_ZDJECIA" alt="Szczypce hydrauliczne 240mm" onerror="this.parentElement.classList.add('no-photo'); this.style.display='none'; this.parentElement.innerHTML='📷<br><small>Brak zdjęcia</small>'">
+            </div>
+            <div class="product-content">
+                <h3 class="product-title" contenteditable="true">Szczypce hydrauliczne <span class="red">240 mm</span></h3>
+                <ul class="product-bullets">
+                    <li><span class="check-icon">✔</span> <strong>Lead:</strong> <span contenteditable="true">Klucz nie trzyma? Praca staje w miejscu.</span></li>
+                    <li><span class="check-icon">✔</span> <strong>Opis:</strong> <span contenteditable="true">Szczypce z kutej stali CrV, rękojeść z PVC, szybka regulacja rozwarcia – pewny chwyt i pełna kontrola.</span></li>
+                </ul>
+                <div class="effect-row">
+                    <span class="effect-badge" contenteditable="true">Efekt:</span>
+                    <span contenteditable="true">Montaż szybki, precyzyjny, bez zmęczenia dłoni.</span>
+                </div>
+                
+                <button class="expand-btn">Rozwiń opis ▼</button>
+                <div class="expanded-content">
+                    <div contenteditable="true">
+                        <strong>Rozszerzony tekst sprzedażowy:</strong><br><br>
+                        Zapomnij o zjechanych gwintach i ślizgających się kluczach. Te szczypce to narzędzie dla profesjonalistów, którzy cenią swój czas. Dzięki systemowi szybkiej regulacji dopasujesz rozstaw szczęk jedną ręką. Hartowane zęby gwarantują zacisk, który nie puszcza, nawet pod ekstremalnym obciążeniem.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUKT 2 -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="TUTAJ_LINK_DO_ZDJECIA" alt="Kolanko ocynkowane 3/4" onerror="this.parentElement.classList.add('no-photo'); this.style.display='none'; this.parentElement.innerHTML='📷<br><small>Brak zdjęcia</small>'">
+            </div>
+            <div class="product-content">
+                <h3 class="product-title" contenteditable="true">Kolanko ocynkowane <span class="red">3/4"</span></h3>
+                <ul class="product-bullets">
+                    <li><span class="check-icon">✔</span> <strong>Lead:</strong> <span contenteditable="true">Trudno dopasować kolanko w ciasnej instalacji?</span></li>
+                    <li><span class="check-icon">✔</span> <strong>Opis:</strong> <span contenteditable="true">Trwała stal, precyzyjny gwint, antykorozyjne wykończenie - montaż bez wycieków.</span></li>
+                </ul>
+                <div class="effect-row">
+                    <span class="effect-badge" contenteditable="true">Efekt:</span>
+                    <span contenteditable="true">Gotowa instalacja w kilka minut, zero problemów.</span>
+                </div>
+                
+                <button class="expand-btn">Rozwiń opis ▼</button>
+                <div class="expanded-content">
+                    <div contenteditable="true">
+                        Tutaj możesz wpisać pełną specyfikację techniczną kolanka (klasa ciśnieniowa, powłoka cynku) oraz historię o tym, jak ten produkt zapobiega awariom w domach klientów.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUKT 3 (Lifestyle) -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="TUTAJ_LINK_DO_ZDJECIA" alt="Plecak minimalistyczny" onerror="this.parentElement.classList.add('no-photo'); this.style.display='none'; this.parentElement.innerHTML='📷<br><small>Brak zdjęcia</small>'">
+            </div>
+            <div class="product-content">
+                <h3 class="product-title" contenteditable="true">Plecak <span class="red">minimalistyczny</span></h3>
+                <ul class="product-bullets">
+                    <li><span class="check-icon">✔</span> <strong>Lead:</strong> <span contenteditable="true">Chaos w rzeczach, brak porządku?</span></li>
+                    <li><span class="check-icon">✔</span> <strong>Opis:</strong> <span contenteditable="true">Przegroda na laptop, wodoodporna powłoka, minimalistyczny design.</span></li>
+                </ul>
+                <div class="effect-row">
+                    <span class="effect-badge" contenteditable="true">Efekt:</span>
+                    <span contenteditable="true">Organizacja rzeczy, wygoda każdego dnia.</span>
+                </div>
+                
+                <button class="expand-btn">Rozwiń opis ▼</button>
+                <div class="expanded-content">
+                    <div contenteditable="true">
+                        Miejski survival wymaga odpowiedniego sprzętu. Ten plecak to nie tylko dodatek, to Twoje mobilne biuro. Wodoodporny materiał chroni elektronikę przed niespodziewanym deszczem, a ukryte kieszenie zabezpieczają dokumenty przed kradzieżą.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+        <!-- 
+        ═══════════════════════════════════════
+        JAK DODAĆ KOLEJNY PRODUKT:
+        Skopiuj cały blok poniżej (od "product-card" do zamknięcia div)
+        i wklej go przed zamykającym </div> listy.
+        Zmień treść na swoje dane.
+        ═══════════════════════════════════════
+        -->
+
+        <!-- PRODUKT 4 - PRZYKŁAD NOWEJ POZYCJI -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="TUTAJ_LINK_DO_ZDJECIA" alt="Produkt 4" onerror="this.parentElement.classList.add('no-photo'); this.style.display='none'; this.parentElement.innerHTML='📷<br><small>Brak zdjęcia</small>'">
+            </div>
+            <div class="product-content">
+                <h3 class="product-title" contenteditable="true">Klucz nasadowy <span class="red">1/2"</span></h3>
+                <ul class="product-bullets">
+                    <li><span class="check-icon">✔</span> <strong>Lead:</strong> <span contenteditable="true">Śruby w trudno dostępnych miejscach? Znamy ten ból.</span></li>
+                    <li><span class="check-icon">✔</span> <strong>Opis:</strong> <span contenteditable="true">Stal chromowo-wanadowa, system antypoślizgowy, kompatybilny z każdą grzechotką 1/2".</span></li>
+                </ul>
+                <div class="effect-row">
+                    <span class="effect-badge" contenteditable="true">Efekt:</span>
+                    <span contenteditable="true">Dostęp tam, gdzie inne klucze zawodzą.</span>
+                </div>
+                <button class="expand-btn">Rozwiń opis ▼</button>
+                <div class="expanded-content">
+                    <div contenteditable="true">
+                        Wpisz tutaj pełny opis sprzedażowy produktu 4.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUKT 5 - PRZYKŁAD NOWEJ POZYCJI -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="TUTAJ_LINK_DO_ZDJECIA" alt="Produkt 5" onerror="this.parentElement.classList.add('no-photo'); this.style.display='none'; this.parentElement.innerHTML='📷<br><small>Brak zdjęcia</small>'">
+            </div>
+            <div class="product-content">
+                <h3 class="product-title" contenteditable="true">Taśma uszczelniająca <span class="red">PTFE 19mm</span></h3>
+                <ul class="product-bullets">
+                    <li><span class="check-icon">✔</span> <strong>Lead:</strong> <span contenteditable="true">Nieszczelność gwintu to awaria, której można uniknąć.</span></li>
+                    <li><span class="check-icon">✔</span> <strong>Opis:</strong> <span contenteditable="true">Taśma PTFE odporna na temperaturę do 260°C, bez kurczenia, idealna do instalacji gazowych i wodnych.</span></li>
+                </ul>
+                <div class="effect-row">
+                    <span class="effect-badge" contenteditable="true">Efekt:</span>
+                    <span contenteditable="true">Szczelność gwarantowana – od pierwszego założenia.</span>
+                </div>
+                <button class="expand-btn">Rozwiń opis ▼</button>
+                <div class="expanded-content">
+                    <div contenteditable="true">
+                        Wpisz tutaj pełny opis sprzedażowy produktu 5.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- koniec .product-list -->
+    <div class="process-section">
+        <div class="badge-title" contenteditable="true">JAK PRACUJĘ?</div>
+        <div class="process-steps">
+            <div class="step">
+                <h4 contenteditable="true">01. Analiza</h4>
+                <p contenteditable="true">Produkt, konkurencja, grupa docelowa</p>
+            </div>
+            <div class="step">
+                <h4 contenteditable="true">02. Konstrukcja</h4>
+                <p contenteditable="true">Lead -> Opis -> Efekt</p>
+            </div>
+            <div class="step">
+                <h4 contenteditable="true">03. Finalizacja</h4>
+                <p contenteditable="true">Tekst gotowy do sklepu (SEO + struktura)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOLNY BLOK (Dlaczego Ja + Call to Action) -->
+    <div class="bottom-block">
+        
+        <!-- NOWA SEKCJA DLACZEGO JA? -->
+        <div class="why-me-section">
+            <div class="why-me-title" contenteditable="true">DLACZEGO JA?</div>
+            <div class="why-me-text" contenteditable="true">
+                Bo nie jestem tylko copywriterem – jestem <strong>hydraulikiem</strong>. Rozumiem różnicę między mosiądzem a znalem, wiem jak działa PVD i dlaczego gwint musi być precyzyjny. Moje opisy to 100% merytoryki, zero lania wody.
+            </div>
+        </div>
+
+        <!-- FOOTER (Przycisk) -->
+        <div class="cta-footer">
+            <h2 contenteditable="true" style="margin-top:0;">Gotowy na teksty, które sprzedają?</h2>
+            <button class="btn-main" contenteditable="true">Zamów próbny opis ➔</button>
+            <p contenteditable="true" style="color: #666; font-size: 0.9rem; margin-top: 15px;">Odpowiadam w 24h</p>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SKRYPT DO ROZWIJANIA OPISÓW -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const expandButtons = document.querySelectorAll('.expand-btn');
+
+        expandButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                content.classList.toggle('show');
+                
+                if (content.classList.contains('show')) {
+                    this.innerHTML = 'Zwiń opis ▲';
+                } else {
+                    this.innerHTML = 'Rozwiń opis ▼';
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
